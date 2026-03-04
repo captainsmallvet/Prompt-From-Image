@@ -1,0 +1,196 @@
+[
+  {
+    "id": 0,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "สร้างแอพชื่อ \"prompt from image\" รายละเอียด ดังนี้\n*** ให้องค์ประกอบทั้งหมดของแอพอยู่ในระนาบเดียวกัน เลื่อน (pan, scroll) ไปพร้อมกัน โดยไม่มีส่วนใดตรึงอยู่กับที่\n\n1. สร้างกรอบแสดงภาพอ้างอิง (reference image) ขนาดกว้าง 500 px. แต่ไม่เกินความกว้างของหน้าจอ สูง 300 px.\nด้านบนเหนือกรอบแสดงภาพอ้างอิง มีส่วนประกอบดังนี้\n* label แสดงชื่อกรอบแสดงภาพอ้างอิง \"Reference ​Image​\"\nด้านล่าง ใต้กรอบแสดงภาพอ้างอิง มีส่วนประกอบดังนี้\n* ปุ่ม Open สำหรับคลิกเพื่อเปิดไฟล์รูปภาพ จาก device เพื่อใช้เป็นภาพอ้างอิง ซึ่งเมื่อคลิกแล้วให้แสดงภาพในกรอบแสดงภาพอ้างอิงนี้ โดยให้ปรับความสูงของกรอบแสดงภาพให้ได้สัดส่วนตามภาพที่แสดง\n* ปุ่ม Clear สำหรับล้างข้อมูล (ภาพอ้างอิง) ในกรอบแสดงภาพอ้างอิง\n\n2. สร้าง drop down : Image Style ไว้ใต้กรอบแสดงภาพอ้างอิง โดยค่าเริ่มต้นเป็น \"เหมือนภาพอ้างอิง\"\n\n3. สร้างช่องแสดงข้อความแบบแก้ไขได้เหมือน Notepad ขนาดกว้างเต็มหน้าจอ สูง 10 บรรทัด โดยให้ pan ดูข้อมูลในส่วนต่างๆ ได้ สำหรับแสดงข้อมูล Addition Details ไว้ใต้ drop down : Image Style\nด้านบนเหนือช่องแสดงข้อมูล Addition Details มีส่วนประกอบดังนี้\n* label แสดงชื่อช่องแสดงข้อความ Addition Details\nด้านล่าง ใต้ช่องแสดงข้อมูล Addition Details มีส่วนประกอบดังนี้\n* ปุ่ม Copy สำหรับ Copy ข้อความทั้งหมดในช่องแสดงข้อมูล Addition Details ลง clipboard\n* ปุ่ม Clear สำหรับลบข้อความทั้งหมดในช่องแสดงข้อมูล Addition Details\n\n4. สร้างช่องแสดงข้อความแบบแก้ไขได้เหมือน Notepad ขนาดกว้างเต็มหน้าจอ สูง 10 บรรทัด โดยให้ pan ดูข้อมูลในส่วนต่างๆ ได้ สำหรับแสดงข้อมูล Image Concept in Thai ไว้ใต้ช่องแสดงข้อมูล Addition Details\nด้านบนเหนือช่องแสดงข้อมูล Image Concept in Thai มีส่วนประกอบดังนี้\n* label แสดงชื่อช่องแสดงข้อความ Image Concept in Thai\nด้านล่าง ใต้ช่องแสดงข้อมูล Image Concept in Thai มีส่วนประกอบดังนี้\n* ปุ่ม Copy สำหรับ Copy ข้อความทั้งหมดในช่องแสดงข้อมูล Image Concept in Thai ลง clipboard\n* ปุ่ม Clear สำหรับลบข้อความทั้งหมดในช่องแสดงข้อมูล Image Concept in Thai\n\n5. สร้างปุ่ม Create Image Concept in Thai ไว้เหนือช่องแสดงข้อมูล Image Concept in Thai\nเมื่อคลิกที่ปุ่มนี้ ให้ AI สวมบทบาท​เป็นนักวิเคราะห์​ภาพ และนักสร้างภาพอธิบายเรื่องราว ที่มีความรู้ ความสามารถสูง มีความรอบรู้ เชี่ยวชาญทั้งในเรื่องจิตวิทยาการเรียนการสอน การถ่ายทอดความรู้ การสื่อสารให้ผู้ฟังเข้าใจเนื่อหาให้ชัดเจนยิ่งขึ้นด้วยภาพประกอบ มีศิลปะในการสร้างภาพได้อย่างสวยงาม โดดเด่น ดึงดูดสายตา เข้าใจง่าย  แล้วให้ AI ทำการศึกษาทำความเข้าใจ และวิเคราะห์ภาพ Reference ​Image​ รวมถึงข้อมูลในช่องแสดงข้อมูล Addition Details (ถ้ามีข้อมูล แต่ถ้าไม่มีข้อมูลก็ข้ามไป) แล้วอธิบายรายละเอียดสำหรับสร้างภาพขึ้นมาใหม่ตาม Reference ​Image​ โดยดัดแปลงภาพตามรายละเอียดใน Addition Details (ถ้ามีข้อมูลใน Addition Details แต่ถ้าไม่มีข้อมูลใน Addition Details ก็ข้ามไป) และดัดแปลงภาพให้เข้ากับ drop down : Image Style ที่เลือก ให้ได้ภาพที่ตรงตามเงื่อนไขข้างต้น ที่สวยงาม โดดเด่น ดึงดูดสายตา เข้าใจง่าย โดยภาพที่ได้ต้องไม่ผิดระเบียบกฎเกณฑ์​ของ YouTube​ ทั้งหมดในปัจจุบัน โดยแนะนำ concept ภาพ เป็นภาษาไทย เพื่ออธิบายให้เห็น concept ของภาพขึ้นมาก่อน แล้ววาง concept ของภาพที่ได้นั้น เป็นภาษาไทย แทนที่ข้อความเดิมในช่องแสดงข้อมูล \"Image Concept in Thai\" โดยจะใช้ concept ภาพที่ได้นี้ในการสร้าง Enhance Prompt​ เป็นภาษาอังกฤษ​อีกที\n\n6. สร้างช่องแสดงข้อความแบบแก้ไขได้เหมือน Notepad ขนาดกว้างเต็มหน้าจอ สูง 10 บรรทัด โดยให้ pan ดูข้อมูลในส่วนต่างๆ ได้ สำหรับแสดงข้อมูล enhance prompt in English ไว้ใต้ช่องแสดงข้อมูล Image Concept in Thai\nด้านบนเหนือช่องแสดงข้อมูล enhance prompt in English มีส่วนประกอบดังนี้\n* label แสดงชื่อช่องแสดงข้อความ enhance prompt in English\n* label แสดงข้อความ Max Prompt Length :\n* ช่องแสดงข้อความแบบแก้ไขได้เหมือน Notepad ขนาดกว้าง 10 ตัวอักษร สูง 1 บรรทัด สำหรับแสดงข้อมูล Max Prompt Length โดยกำหนดค่าเริ่มต้นเป็น 800\n* label แสดงข้อความ characters\n*** โดยให้ส่วนประกอบ 3 รายการนี้คือ ตั้งแต่ label แสดงข้อความ Max Prompt Length : จนถึง label แสดงข้อความ characters เรียงอยู่ในบรรทัดเดียวกัน\n* ปุ่ม Create enhance prompt in English\nเมื่อคลิกที่ปุ่มนี้ ให้ AI สวมบทบาท​เป็น Prompt Engineer ที่มีความรู้ ความสามารถสูง มีความรอบรู้ เชี่ยวชาญทั้งในเรื่องจิตวิทยาการเรียนการสอน การถ่ายทอดความรู้ การสื่อสารให้ผู้ฟังเข้าใจเนื่อหาให้ชัดเจนยิ่งขึ้นด้วยภาพประกอบ มีศิลปะในการสร้างภาพได้อย่างสวยงาม โดดเด่น ดึงดูดสายตา เข้าใจง่าย แล้วให้ AI ทำการศึกษาทำความเข้าใจ และวิเคราะห์ข้อมูลในช่องแสดงข้อมูล Image Concept in Thai แล้วให้ AI ออกแบบภาพขึ้นมาให้สอดคล้องกับข้อมูลในช่องแสดงข้อมูล Image Concept in Thai ให้สวยงาม โดดเด่น ดึงดูดสายตา เข้าใจง่าย โดยภาพที่ได้ต้องไม่ผิดระเบียบกฎเกณฑ์​ของ YouTube​ ทั้งหมดในปัจจุบัน\nแล้วให้ AI สร้าง prompt ภาษาอังกฤษอย่างละเอียด ชัดเจน สำหรับสร้างภาพนั้นขึ้นมา โดยให้ความยาวของ prompt ไม่เกินค่า Max Prompt Length ที่ระบุไว้ในช่องแสดงข้อมูล Max Prompt Length (หน่วยเป็นจำนวนตัวอักษร หรือ characters) โดยค่า Max Prompt Length นี้เป็นการนับรวมทั้งตัวอักษรและช่องว่าง\nแล้วให้วาง enhance prompt in English ที่ได้ แทนที่ข้อความเดิมในช่องแสดงข้อมูล enhance prompt in English\n\nด้านล่าง ใต้ช่องแสดงข้อมูล enhance prompt in English มีส่วนประกอบดังนี้\n* ปุ่ม Copy สำหรับ Copy ข้อความทั้งหมดในช่องแสดงข้อมูล enhance prompt in English ลง clipboard\n* ปุ่ม Clear สำหรับลบข้อความทั้งหมดในช่องแสดงข้อมูล enhance prompt in English\n\n7. สร้าง drop down สำหรับเลือก Model สร้างภาพ (ทุก Model ที่ใช้ได้) ให้ค่าเริ่มต้นเป็น Gemini 2.5 Flash Image\nสร้าง drop down สำหรับเลือก Aspect Ratio​ (ค่าเริ่มต้นเป็น 16:9)\nและสร้างปุ่ม Create Image\nไว้ใต้ช่องแสดงข้อมูล enhance prompt in English\nเมื่อคลิกปุ่ม Create Image ให้สร้างภาพตาม prompt ในช่องแสดงข้อมูล \"enhance prompt in English\" ให้ได้ภาพคุณภาพสูงที่สุด ด้วย Model และ Aspect Ratio ที่เลือก แล้ววางภาพที่ได้ในช่องแสดงภาพใต้ปุ่ม Create Image ขนาดกว้าง 500 px. (แต่ไม่เกินความกว้างของหน้าจอ) สูงตามสัดส่วนภาพ พร้อมปุ่ม Download​ สำหรับ Download​ ภาพคุณภาพสูงที่สุดลง Device และปุ่ม Use as Reference เพื่อวางภาพนี้ในกรอบแสดงภาพอ้างอิง \"Reference ​Image​\" ที่ด้านบนของแอพ เพื่อใช้เป็นภาพอ้างอิงสำหรับสร้างภาพใหม่อีกรอบด้วยครับ",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768929930,
+      "nanos": 431000000
+    }
+  },
+  {
+    "id": 1,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": "**Envisioning the Interface**\n\nI'm now fully immersed in the design phase. My focus is on crafting a clean, single-page React application for \"Prompt from Image.\" I'm prioritizing a smooth, scroll-based user experience, shunning any sticky elements to keep the interface uncluttered.\n\n\n**Refining the UI Components**\n\nI've been meticulously refining the UI components. The layout is set, and I'm adding functional elements like the reference image section with clear \"Open\" and \"Clear\" buttons, along with a style dropdown. I'm also working on detail input areas, Thai concept generation, prompt enhancement, and the final generation controls, including model and aspect ratio selections, and the all-important \"Create Image\" button.\n\n\n**Defining the Generation Steps**\n\nI'm now nailing down the crucial image generation pipeline. This involves analyzing a Thai image concept, acting as a prompt engineer to create a detailed English prompt, and then, using Gemini to produce the image, leveraging a selected aspect ratio. The framework will be React 18 with TypeScript and Tailwind CSS, along with the `@google/genai` library for API calls, authenticated with an environment variable for the API key.\n\n\n**Building the React Structure**\n\nI'm making progress on the React structure. I've set up the main components: `App.tsx` for state management, a reusable notepad area (`NotepadArea.tsx`), and helper functions for Gemini calls (`services/gemini.ts`). I'm now integrating Tailwind CSS via the `index.html` file.\n\n\n**Constructing the Components**\n\nI've established the foundation, focusing on responsiveness. I've set the image area to a maximum width of 500px, responsive to the screen. The notepad style includes padding and a monospace font. I've also implemented a max prompt length layout. The supported models are `gemini-2.5-flash-image` and `gemini-3-pro-image-preview`. I've set up `index.tsx`, `App.tsx`, `GeminiService.ts`, and `types.ts`, and incorporated \"YouTube guidelines\" to ensure prompt safety. Aspect ratios are set.\n\n\n",
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768929930,
+      "nanos": 431000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768929940,
+      "nanos": 417000000
+    }
+  },
+  {
+    "id": 2,
+    "author": "model",
+    "payload": {
+      "type": "generationTable",
+      "entries": [
+        {
+          "path": "metadata.json",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Application metadata specifying the name, description, and required permissions.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n{\n  \"name\": \"Prompt from Image\",\n  \"description\": \"An AI-powered tool that analyzes reference images to create detailed visual concepts and enhanced English prompts for high-quality image generation.\",\n  \"requestFramePermissions\": [\n    \"camera\"\n  ]\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "index.html",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Main HTML entry point with Tailwind CSS support.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Prompt from Image</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <link href=\"https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kalam:wght@400;700&display=swap\" rel=\"stylesheet\">\n    <style>\n        body {\n            font-family: 'Sarabun', sans-serif;\n            background-color: #f8fafc;\n        }\n        .notepad-font {\n            font-family: 'Kalam', cursive;\n        }\n    </style>\n</head>\n<body class=\"overflow-x-hidden\">\n    <div id=\"root\"></div>\n</body>\n</html>\n"
+            }
+          ]
+        },
+        {
+          "path": "index.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "React application entry point.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\nimport ReactDOM from 'react-dom/client';\nimport App from './App';\n\nconst rootElement = document.getElementById('root');\nif (!rootElement) {\n  throw new Error(\"Could not find root element to mount to\");\n}\n\nconst root = ReactDOM.createRoot(rootElement);\nroot.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>\n);\n"
+            }
+          ]
+        },
+        {
+          "path": "types.ts",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Shared type definitions for the application.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nexport enum ImageStyle {\n  REFERENCE = 'เหมือนภาพอ้างอิง',\n  CINEMATIC = 'Cinematic',\n  CARTOON = 'Cartoon/Illustration',\n  ANIME = 'Anime Style',\n  REALISTIC = 'Photo Realistic',\n  THREE_D_RENDER = '3D Render',\n  OIL_PAINTING = 'Oil Painting',\n  PIXEL_ART = 'Pixel Art',\n}\n\nexport enum ModelType {\n  FLASH_IMAGE = 'gemini-2.5-flash-image',\n  PRO_IMAGE = 'gemini-3-pro-image-preview',\n}\n\nexport type AspectRatio = '1:1' | '3:4' | '4:3' | '9:16' | '16:9';\n\nexport interface AppState {\n  referenceImage: string | null;\n  imageStyle: ImageStyle;\n  additionDetails: string;\n  imageConceptThai: string;\n  enhancePromptEnglish: string;\n  maxPromptLength: number;\n  selectedModel: ModelType;\n  selectedAspectRatio: AspectRatio;\n  generatedImage: string | null;\n  isLoading: boolean;\n  statusMessage: string;\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "services/geminiService.ts",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Service layer for interacting with the Google Gemini API.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport { GoogleGenAI, GenerateContentResponse } from \"@google/genai\";\nimport { ImageStyle, ModelType, AspectRatio } from \"../types\";\n\nexport const generateConceptInThai = async (\n  imageB64: string | null,\n  additionDetails: string,\n  imageStyle: ImageStyle\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n  \n  const parts: any[] = [];\n  \n  if (imageB64) {\n    const base64Data = imageB64.split(',')[1];\n    const mimeType = imageB64.split(';')[0].split(':')[1];\n    parts.push({\n      inlineData: {\n        data: base64Data,\n        mimeType: mimeType,\n      },\n    });\n  }\n\n  const prompt = `\n    คุณคือผู้เชี่ยวชาญระดับสูงในการวิเคราะห์ภาพและสร้างสรรค์ภาพประกอบ\n    บทบาท: นักวิเคราะห์ภาพและนักสร้างภาพอธิบายเรื่องราวที่มีความรู้ความสามารถสูง เชี่ยวชาญทั้งจิตวิทยาการเรียนการสอน การสื่อสารให้เห็นภาพ และมีศิลปะในการสร้างภาพที่สวยงาม โดดเด่น ดึงดูดสายตา\n\n    งานของคุณ:\n    1. ศึกษาภาพอ้างอิง (ถ้ามี)\n    2. วิเคราะห์ข้อมูลเพิ่มเติม: \"${additionDetails}\"\n    3. พิจารณาสไตล์ภาพที่ต้องการ: \"${imageStyle}\"\n    \n    คำสั่ง:\n    จงอธิบายคอนเซปต์สำหรับสร้างภาพขึ้นมาใหม่ โดยดัดแปลงให้สอดคล้องกับภาพอ้างอิง ข้อมูลเพิ่มเติม และสไตล์ที่เลือก\n    ภาพต้องมีความสวยงาม โดดเด่น ดึงดูดสายตา และเข้าใจง่าย\n    สำคัญมาก: ภาพที่อธิบายต้องไม่ผิดกฎเกณฑ์ของ YouTube ทุกรูปแบบ\n    \n    ผลลัพธ์: ให้ตอบเป็นภาษาไทยเท่านั้น โดยสรุปเป็น \"Concept ของภาพ\" ที่ชัดเจน เพื่อนำไปใช้สร้าง Prompt ต่อไป\n  `;\n\n  parts.push({ text: prompt });\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: { parts },\n  });\n\n  return response.text || '';\n};\n\nexport const generateEnhancedPrompt = async (\n  thaiConcept: string,\n  maxLength: number\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n\n  const prompt = `\n    คุณคือ Prompt Engineer ระดับมืออาชีพ เชี่ยวชาญการออกแบบภาพที่สวยงามและสื่อสารได้ทรงพลัง\n    งานของคุณ: ศึกษาและวิเคราะห์ \"Concept ภาพภาษาไทย\" ด้านล่างนี้ แล้วออกแบบเป็น Image Generation Prompt ภาษาอังกฤษที่ละเอียด ชัดเจน และทรงพลังที่สุด\n\n    Thai Concept: \"${thaiConcept}\"\n\n    เงื่อนไข:\n    1. สร้าง prompt ภาษาอังกฤษที่อธิบายรายละเอียดเชิงลึก (แสง, องค์ประกอบ, สี, บรรยากาศ)\n    2. ความยาวทั้งหมด (รวมตัวอักษรและช่องว่าง) ต้องไม่เกิน ${maxLength} ตัวอักษร\n    3. ภาพต้องสวยงาม โดดเด่น ดึงดูดสายตา และไม่ละเมิดกฎ YouTube\n    \n    คำสั่ง: ส่งกลับมาเฉพาะตัวข้อความ Prompt ภาษาอังกฤษเท่านั้น ห้ามมีคำเกริ่นนำ\n  `;\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: prompt,\n  });\n\n  return response.text?.slice(0, maxLength).trim() || '';\n};\n\nexport const generateImage = async (\n  prompt: string,\n  model: ModelType,\n  aspectRatio: AspectRatio\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n\n  const response = await ai.models.generateContent({\n    model: model,\n    contents: {\n      parts: [{ text: prompt }],\n    },\n    config: {\n      imageConfig: {\n        aspectRatio: aspectRatio,\n        imageSize: \"1K\"\n      }\n    },\n  });\n\n  let imageUrl = '';\n  if (response.candidates && response.candidates[0].content.parts) {\n    for (const part of response.candidates[0].content.parts) {\n      if (part.inlineData) {\n        imageUrl = `data:image/png;base64,${part.inlineData.data}`;\n        break;\n      }\n    }\n  }\n\n  if (!imageUrl) throw new Error(\"Could not extract image from response\");\n  return imageUrl;\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "components/NotepadArea.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "A styled textarea component that looks like a notepad.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\n\ninterface NotepadAreaProps {\n  label: string;\n  value: string;\n  onChange: (val: string) => void;\n  onCopy: () => void;\n  onClear: () => void;\n  placeholder?: string;\n  rows?: number;\n}\n\nconst NotepadArea: React.FC<NotepadAreaProps> = ({\n  label,\n  value,\n  onChange,\n  onCopy,\n  onClear,\n  placeholder,\n  rows = 10\n}) => {\n  return (\n    <div className=\"flex flex-col w-full mb-6\">\n      <label className=\"text-gray-700 font-bold mb-2 ml-1 text-lg\">{label}</label>\n      <div className=\"relative border-2 border-yellow-200 rounded-lg shadow-sm bg-yellow-50 overflow-hidden\">\n        <textarea\n          rows={rows}\n          className=\"w-full p-4 bg-transparent outline-none resize-none notepad-font text-xl leading-relaxed text-gray-800\"\n          value={value}\n          onChange={(e) => onChange(e.target.value)}\n          placeholder={placeholder}\n        />\n        <div className=\"absolute left-0 top-0 bottom-0 w-8 border-r border-red-200 opacity-30 pointer-events-none\"></div>\n      </div>\n      <div className=\"flex gap-2 mt-2\">\n        <button\n          onClick={onCopy}\n          className=\"px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors text-sm font-medium\"\n        >\n          Copy\n        </button>\n        <button\n          onClick={onClear}\n          className=\"px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md transition-colors text-sm font-medium\"\n        >\n          Clear\n        </button>\n      </div>\n    </div>\n  );\n};\n\nexport default NotepadArea;\n"
+            }
+          ]
+        },
+        {
+          "path": "App.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Main application component with UI layout and orchestration logic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React, { useState, useRef, useEffect } from 'react';\nimport { ImageStyle, ModelType, AspectRatio, AppState } from './types';\nimport NotepadArea from './components/NotepadArea';\nimport * as geminiService from './services/geminiService';\n\nconst App: React.FC = () => {\n  const [state, setState] = useState<AppState>({\n    referenceImage: null,\n    imageStyle: ImageStyle.REFERENCE,\n    additionDetails: '',\n    imageConceptThai: '',\n    enhancePromptEnglish: '',\n    maxPromptLength: 800,\n    selectedModel: ModelType.FLASH_IMAGE,\n    selectedAspectRatio: '16:9',\n    generatedImage: null,\n    isLoading: false,\n    statusMessage: '',\n  });\n\n  const fileInputRef = useRef<HTMLInputElement>(null);\n\n  const updateState = (updates: Partial<AppState>) => {\n    setState(prev => ({ ...prev, ...updates }));\n  };\n\n  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (file) {\n      const reader = new FileReader();\n      reader.onload = (event) => {\n        updateState({ referenceImage: event.target?.result as string });\n      };\n      reader.readAsDataURL(file);\n    }\n  };\n\n  const handleOpenClick = () => {\n    fileInputRef.current?.click();\n  };\n\n  const copyToClipboard = (text: string) => {\n    navigator.clipboard.writeText(text).then(() => {\n      alert('Copied to clipboard!');\n    });\n  };\n\n  const handleCreateThaiConcept = async () => {\n    updateState({ isLoading: true, statusMessage: 'Analyzing image and details...' });\n    try {\n      const concept = await geminiService.generateConceptInThai(\n        state.referenceImage,\n        state.additionDetails,\n        state.imageStyle\n      );\n      updateState({ imageConceptThai: concept });\n    } catch (error) {\n      console.error(error);\n      alert('Error creating concept in Thai');\n    } finally {\n      updateState({ isLoading: false, statusMessage: '' });\n    }\n  };\n\n  const handleCreateEnhancedPrompt = async () => {\n    if (!state.imageConceptThai) {\n      alert('Please create or enter Thai concept first.');\n      return;\n    }\n    updateState({ isLoading: true, statusMessage: 'Generating enhanced English prompt...' });\n    try {\n      const prompt = await geminiService.generateEnhancedPrompt(\n        state.imageConceptThai,\n        state.maxPromptLength\n      );\n      updateState({ enhancePromptEnglish: prompt });\n    } catch (error) {\n      console.error(error);\n      alert('Error creating enhanced prompt');\n    } finally {\n      updateState({ isLoading: false, statusMessage: '' });\n    }\n  };\n\n  const handleCreateImage = async () => {\n    if (!state.enhancePromptEnglish) {\n      alert('Please create or enter English prompt first.');\n      return;\n    }\n\n    if (state.selectedModel === ModelType.PRO_IMAGE) {\n      const hasKey = await (window as any).aistudio?.hasSelectedApiKey();\n      if (!hasKey) {\n        alert(\"This model requires a paid API key. Please select one.\");\n        await (window as any).aistudio?.openSelectKey();\n        return;\n      }\n    }\n\n    updateState({ isLoading: true, statusMessage: 'Generating high-quality image...' });\n    try {\n      const imgUrl = await geminiService.generateImage(\n        state.enhancePromptEnglish,\n        state.selectedModel,\n        state.selectedAspectRatio\n      );\n      updateState({ generatedImage: imgUrl });\n    } catch (error: any) {\n      console.error(error);\n      if (error.message?.includes(\"Requested entity was not found\")) {\n        await (window as any).aistudio?.openSelectKey();\n      } else {\n        alert('Error creating image');\n      }\n    } finally {\n      updateState({ isLoading: false, statusMessage: '' });\n    }\n  };\n\n  const handleDownloadImage = () => {\n    if (!state.generatedImage) return;\n    const link = document.createElement('a');\n    link.href = state.generatedImage;\n    link.download = `generated-image-${Date.now()}.png`;\n    document.body.appendChild(link);\n    link.click();\n    document.body.removeChild(link);\n  };\n\n  const handleUseAsReference = () => {\n    if (state.generatedImage) {\n      updateState({ referenceImage: state.generatedImage });\n      window.scrollTo({ top: 0, behavior: 'smooth' });\n    }\n  };\n\n  return (\n    <div className=\"min-h-screen p-4 md:p-8 flex flex-col items-center\">\n      <div className=\"w-full max-w-[500px] flex flex-col gap-6\">\n        <h1 className=\"text-3xl font-extrabold text-indigo-700 text-center mb-4 uppercase tracking-wider\">\n          Prompt From Image\n        </h1>\n\n        {/* 1. Reference Image */}\n        <div className=\"flex flex-col w-full\">\n          <label className=\"text-gray-700 font-bold mb-2 ml-1 text-lg\">Reference Image</label>\n          <div className=\"w-full h-[300px] bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center\">\n            {state.referenceImage ? (\n              <img \n                src={state.referenceImage} \n                alt=\"Reference\" \n                className=\"max-w-full max-h-full object-contain\"\n              />\n            ) : (\n              <span className=\"text-gray-400\">No Image Selected</span>\n            )}\n          </div>\n          <div className=\"flex gap-2 mt-2\">\n            <button \n              onClick={handleOpenClick}\n              className=\"px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors font-medium\"\n            >\n              Open\n            </button>\n            <button \n              onClick={() => updateState({ referenceImage: null })}\n              className=\"px-4 py-2 bg-red-400 hover:bg-red-500 text-white rounded-md transition-colors font-medium\"\n            >\n              Clear\n            </button>\n          </div>\n          <input \n            type=\"file\" \n            ref={fileInputRef} \n            className=\"hidden\" \n            accept=\"image/*\" \n            onChange={handleFileChange}\n          />\n        </div>\n\n        {/* 2. Image Style */}\n        <div className=\"flex flex-col w-full\">\n          <label className=\"text-gray-700 font-bold mb-2 ml-1 text-lg\">Image Style</label>\n          <select \n            className=\"w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors\"\n            value={state.imageStyle}\n            onChange={(e) => updateState({ imageStyle: e.target.value as ImageStyle })}\n          >\n            {Object.values(ImageStyle).map(style => (\n              <option key={style} value={style}>{style}</option>\n            ))}\n          </select>\n        </div>\n\n        {/* 3. Addition Details */}\n        <NotepadArea \n          label=\"Addition Details\"\n          value={state.additionDetails}\n          onChange={(val) => updateState({ additionDetails: val })}\n          onCopy={() => copyToClipboard(state.additionDetails)}\n          onClear={() => updateState({ additionDetails: '' })}\n          placeholder=\"ระบุรายละเอียดเพิ่มเติมที่ต้องการดัดแปลง...\"\n        />\n\n        {/* 5. Create Image Concept in Thai Button */}\n        <button \n          onClick={handleCreateThaiConcept}\n          disabled={state.isLoading}\n          className=\"w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50\"\n        >\n          {state.isLoading ? 'Processing...' : 'Create Image Concept in Thai'}\n        </button>\n\n        {/* 4. Image Concept in Thai */}\n        <NotepadArea \n          label=\"Image Concept in Thai\"\n          value={state.imageConceptThai}\n          onChange={(val) => updateState({ imageConceptThai: val })}\n          onCopy={() => copyToClipboard(state.imageConceptThai)}\n          onClear={() => updateState({ imageConceptThai: '' })}\n          placeholder=\"Concept ภาพภาษาไทยจะแสดงที่นี่...\"\n        />\n\n        {/* 6. Enhance Prompt in English Section */}\n        <div className=\"flex flex-col gap-2 mb-2\">\n          <div className=\"flex flex-wrap items-center gap-2 text-sm font-bold text-gray-700 mb-1\">\n             <span>Max Prompt Length :</span>\n             <input \n               type=\"number\"\n               className=\"w-20 p-1 border border-gray-300 rounded bg-white text-center notepad-font\"\n               value={state.maxPromptLength}\n               onChange={(e) => updateState({ maxPromptLength: parseInt(e.target.value) || 0 })}\n             />\n             <span>characters</span>\n          </div>\n          <button \n            onClick={handleCreateEnhancedPrompt}\n            disabled={state.isLoading}\n            className=\"w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50\"\n          >\n            {state.isLoading ? 'Processing...' : 'Create enhance prompt in English'}\n          </button>\n        </div>\n\n        <NotepadArea \n          label=\"enhance prompt in English\"\n          value={state.enhancePromptEnglish}\n          onChange={(val) => updateState({ enhancePromptEnglish: val })}\n          onCopy={() => copyToClipboard(state.enhancePromptEnglish)}\n          onClear={() => updateState({ enhancePromptEnglish: '' })}\n          placeholder=\"Enhanced English Prompt will appear here...\"\n        />\n\n        {/* 7. Model Selection and Create Image */}\n        <div className=\"flex flex-col gap-4 mb-10\">\n          <div className=\"flex flex-col\">\n            <label className=\"text-gray-700 font-bold mb-2 ml-1 text-lg\">Model สร้างภาพ</label>\n            <select \n              className=\"w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors\"\n              value={state.selectedModel}\n              onChange={(e) => updateState({ selectedModel: e.target.value as ModelType })}\n            >\n              <option value={ModelType.FLASH_IMAGE}>Gemini 2.5 Flash Image</option>\n              <option value={ModelType.PRO_IMAGE}>Gemini 3 Pro Image (Requires Key Selection)</option>\n            </select>\n          </div>\n\n          <div className=\"flex flex-col\">\n            <label className=\"text-gray-700 font-bold mb-2 ml-1 text-lg\">Aspect Ratio</label>\n            <select \n              className=\"w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors\"\n              value={state.selectedAspectRatio}\n              onChange={(e) => updateState({ selectedAspectRatio: e.target.value as AspectRatio })}\n            >\n              <option value=\"1:1\">1:1 (Square)</option>\n              <option value=\"3:4\">3:4 (Portrait)</option>\n              <option value=\"4:3\">4:3 (Landscape)</option>\n              <option value=\"9:16\">9:16 (Tall)</option>\n              <option value=\"16:9\">16:9 (Wide)</option>\n            </select>\n          </div>\n\n          <button \n            onClick={handleCreateImage}\n            disabled={state.isLoading}\n            className=\"w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-xl shadow-lg transition-all active:scale-95 disabled:opacity-50\"\n          >\n            {state.isLoading ? 'Generating Image...' : 'CREATE IMAGE'}\n          </button>\n\n          {state.statusMessage && (\n            <p className=\"text-center text-indigo-600 font-semibold animate-pulse\">{state.statusMessage}</p>\n          )}\n\n          {state.generatedImage && (\n            <div className=\"flex flex-col items-center mt-4 p-4 border-2 border-indigo-100 bg-white rounded-2xl shadow-xl\">\n              <img \n                src={state.generatedImage} \n                alt=\"Generated\" \n                className=\"w-full rounded-lg shadow-sm mb-4\"\n              />\n              <div className=\"flex gap-4 w-full\">\n                <button \n                  onClick={handleDownloadImage}\n                  className=\"flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors\"\n                >\n                  Download\n                </button>\n                <button \n                  onClick={handleUseAsReference}\n                  className=\"flex-1 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-lg transition-colors\"\n                >\n                  Use as Reference\n                </button>\n              </div>\n            </div>\n          )}\n        </div>\n      </div>\n    </div>\n  );\n};\n\nexport default App;\n"
+            }
+          ]
+        }
+      ]
+    },
+    "createdTimestamp": {
+      "seconds": 1768929940,
+      "nanos": 418000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768929940,
+      "nanos": 543000000
+    }
+  },
+  {
+    "id": 3,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "Fix the following errors:\n\n```\n{\"error\":{\"code\":400,\"message\":\"[original: beyond::dependency::3] image_size is only supported for Gempix 2 recipe.\",\"status\":\"INVALID_ARGUMENT\"}}\n```",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768931375,
+      "nanos": 226000000
+    }
+  },
+  {
+    "id": 4,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": "**Analyzing the Error**\n\nI'm focused on resolving a 400 error stemming from an unsupported `imageSize` usage. The error points towards an incompatibility with the Gempix 2 recipe, suggesting incorrect application or usage of `imageSize`. I'm cross-referencing coding guidelines and the specific error message to pinpoint the exact issue.\n\n\n**Investigating the Root Cause**\n\nI've determined the issue lies within the `geminiService.ts` file, specifically where `imageSize: \"1K\"` is consistently being passed to the image generation function. The error's phrasing, *`image_size` is only supported for Gempix 2 recipe*, confirms my suspicions. I believe the incompatibility stems from the model type passed, likely `gemini-2.5-flash-image`, which may not support the `imageSize` parameter. I need to verify that conditional logic handles image size correctly for unsupported models.\n\n\n**Refining the Solution**\n\nI'm now zeroing in on the conditional logic within `geminiService.ts`. I need to ensure that the `imageSize` parameter is included only when the model is `gemini-3-pro-image-preview`, also known as `ModelType.PRO_IMAGE`. The error message reinforces this; it relates to \"Gempix 2,\" which I now realize maps to Gemini 3 Pro Image. The Gemini 2.5 Flash is likely Gempix 1 and thus does not support this parameter. I need to review and modify `generateImage` to conditionally add this parameter, while ensuring that the `aspectRatio` is always included.\n\n\n**Correcting the Conditional Logic**\n\nI've just had a breakthrough; I realize I was passing `imageSize` with the wrong model. I'm updating `geminiService.ts` to ensure `imageSize` is only used when the model is `ModelType.PRO_IMAGE`. I've verified the `ModelType` names in `types.ts` match. I am also making sure I check if `imageConfig` exists before modifying it, because it is an `any` object, which may be uninitialized, leading to a similar error.\n\n\n**Revising Default Handling**\n\nI'm now zeroing in on an edge case with the `imageSize` parameter in `geminiService.ts`. I noticed the backend expects `imageSize` to be omitted if set to the default \"1K\", but this conflicts with the current guideline which states it's exclusively supported for the Pro model. I'm reviewing and refining the logic within `generateImage` to conditionally omit `imageSize` for default values, ensuring adherence to both guidelines and backend expectations.\n\n\n",
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768931375,
+      "nanos": 226000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768931386,
+      "nanos": 212000000
+    }
+  },
+  {
+    "id": 5,
+    "author": "model",
+    "payload": {
+      "type": "generationTable",
+      "entries": [
+        {
+          "path": "services/geminiService.ts",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Update generateImage to conditionally include imageSize only for gemini-3-pro-image-preview, fixing the 'image_size is only supported for Gempix 2 recipe' error when using the flash model.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport { GoogleGenAI, GenerateContentResponse } from \"@google/genai\";\nimport { ImageStyle, ModelType, AspectRatio } from \"../types\";\n\nexport const generateConceptInThai = async (\n  imageB64: string | null,\n  additionDetails: string,\n  imageStyle: ImageStyle\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n  \n  const parts: any[] = [];\n  \n  if (imageB64) {\n    const base64Data = imageB64.split(',')[1];\n    const mimeType = imageB64.split(';')[0].split(':')[1];\n    parts.push({\n      inlineData: {\n        data: base64Data,\n        mimeType: mimeType,\n      },\n    });\n  }\n\n  const prompt = `\n    คุณคือผู้เชี่ยวชาญระดับสูงในการวิเคราะห์ภาพและสร้างสรรค์ภาพประกอบ\n    บทบาท: นักวิเคราะห์ภาพและนักสร้างภาพอธิบายเรื่องราวที่มีความรู้ความสามารถสูง เชี่ยวชาญทั้งจิตวิทยาการเรียนการสอน การสื่อสารให้เห็นภาพ และมีศิลปะในการสร้างภาพที่สวยงาม โดดเด่น ดึงดูดสายตา\n\n    งานของคุณ:\n    1. ศึกษาภาพอ้างอิง (ถ้ามี)\n    2. วิเคราะห์ข้อมูลเพิ่มเติม: \"${additionDetails}\"\n    3. พิจารณาสไตล์ภาพที่ต้องการ: \"${imageStyle}\"\n    \n    คำสั่ง:\n    จงอธิบายคอนเซปต์สำหรับสร้างภาพขึ้นมาใหม่ โดยดัดแปลงให้สอดคล้องกับภาพอ้างอิง ข้อมูลเพิ่มเติม และสไตล์ที่เลือก\n    ภาพต้องมีความสวยงาม โดดเด่น ดึงดูดสายตา และเข้าใจง่าย\n    สำคัญมาก: ภาพที่อธิบายต้องไม่ผิดกฎเกณฑ์ของ YouTube ทุกรูปแบบ\n    \n    ผลลัพธ์: ให้ตอบเป็นภาษาไทยเท่านั้น โดยสรุปเป็น \"Concept ของภาพ\" ที่ชัดเจน เพื่อนำไปใช้สร้าง Prompt ต่อไป\n  `;\n\n  parts.push({ text: prompt });\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: { parts },\n  });\n\n  return response.text || '';\n};\n\nexport const generateEnhancedPrompt = async (\n  thaiConcept: string,\n  maxLength: number\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n\n  const prompt = `\n    คุณคือ Prompt Engineer ระดับมืออาชีพ เชี่ยวชาญการออกแบบภาพที่สวยงามและสื่อสารได้ทรงพลัง\n    งานของคุณ: ศึกษาและวิเคราะห์ \"Concept ภาพภาษาไทย\" ด้านล่างนี้ แล้วออกแบบเป็น Image Generation Prompt ภาษาอังกฤษที่ละเอียด ชัดเจน และทรงพลังที่สุด\n\n    Thai Concept: \"${thaiConcept}\"\n\n    เงื่อนไข:\n    1. สร้าง prompt ภาษาอังกฤษที่อธิบายรายละเอียดเชิงลึก (แสง, องค์ประกอบ, สี, บรรยากาศ)\n    2. ความยาวทั้งหมด (รวมตัวอักษรและช่องว่าง) ต้องไม่เกิน ${maxLength} ตัวอักษร\n    3. ภาพต้องสวยงาม โดดเด่น ดึงดูดสายตา และไม่ละเมิดกฎ YouTube\n    \n    คำสั่ง: ส่งกลับมาเฉพาะตัวข้อความ Prompt ภาษาอังกฤษเท่านั้น ห้ามมีคำเกริ่นนำ\n  `;\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: prompt,\n  });\n\n  return response.text?.slice(0, maxLength).trim() || '';\n};\n\nexport const generateImage = async (\n  prompt: string,\n  model: ModelType,\n  aspectRatio: AspectRatio\n): Promise<string> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });\n\n  // imageSize is only supported for gemini-3-pro-image-preview\n  const imageConfig: any = {\n    aspectRatio: aspectRatio,\n  };\n\n  if (model === ModelType.PRO_IMAGE) {\n    imageConfig.imageSize = \"1K\";\n  }\n\n  const response = await ai.models.generateContent({\n    model: model,\n    contents: {\n      parts: [{ text: prompt }],\n    },\n    config: {\n      imageConfig: imageConfig,\n    },\n  });\n\n  let imageUrl = '';\n  if (response.candidates && response.candidates[0].content.parts) {\n    for (const part of response.candidates[0].content.parts) {\n      if (part.inlineData) {\n        imageUrl = `data:image/png;base64,${part.inlineData.data}`;\n        break;\n      }\n    }\n  }\n\n  if (!imageUrl) throw new Error(\"Could not extract image from response\");\n  return imageUrl;\n};\n"
+            }
+          ]
+        }
+      ]
+    },
+    "createdTimestamp": {
+      "seconds": 1768931386,
+      "nanos": 212000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768931390,
+      "nanos": 939000000
+    }
+  }
+]
