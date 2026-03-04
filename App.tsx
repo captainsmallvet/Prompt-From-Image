@@ -161,7 +161,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-[500px] flex flex-col gap-6">
+      <div className="w-full max-w-[1000px] flex flex-col gap-6">
       {/* API Key Management Bar */}
               <div className="mb-6 p-4 bg-gray-900 border border-emerald-500/30 rounded-xl">
                         <div className="flex flex-col gap-2">
