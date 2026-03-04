@@ -92,7 +92,7 @@ const App: React.FC = () => {
       return;
     }
 
-    if (state.selectedModel === ModelType.PRO_IMAGE) {
+    if (state.selectedModel === ModelType.PRO_IMAGE || state.selectedModel === ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW) {
       const hasKey = await (window as any).aistudio?.hasSelectedApiKey();
       if (!hasKey) {
         alert("This model requires a paid API key. Please select one.");
@@ -282,8 +282,12 @@ const App: React.FC = () => {
               value={state.selectedModel}
               onChange={(e) => updateState({ selectedModel: e.target.value as ModelType })}
             >
-              <option value={ModelType.FLASH_IMAGE}>Gemini 2.5 Flash Image</option>
-              <option value={ModelType.PRO_IMAGE}>Gemini 3 Pro Image (Requires Key Selection)</option>
+<option value={ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW}>Gemini 3.1 Flash Image (High Quality)</option>
+<option value={ModelType.PRO_IMAGE}>Gemini 3.0 Pro Image (Premium)</option>
+<option value={ModelType.FLASH_IMAGE}>Gemini 2.5 Flash Image (Standard)</option>
+<option value={ModelType.IMAGEN_4_0_GENERATE_001}>Imagen 4.0</option>
+<option value={ModelType.GEMINI_FLASH_IMAGE_LATEST}>Gemini Flash Image Latest</option>
+<option value={ModelType.GEMINI_PRO_IMAGE_LATEST}>Gemini Pro Image Latest</option>
             </select>
           </div>
 

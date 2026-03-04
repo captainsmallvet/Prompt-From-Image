@@ -86,12 +86,26 @@ export const generateImage = async (
 ): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  // imageSize is only supported for gemini-3-pro-image-preview
+  if (model === ModelType.IMAGEN_4_0_GENERATE_001) {
+    const response = await ai.models.generateImages({
+        model: model,
+        prompt: prompt,
+        config: {
+          numberOfImages: 1,
+          outputMimeType: 'image/jpeg',
+          aspectRatio: aspectRatio,
+        },
+    });
+    const base64EncodeString: string = response.generatedImages[0].image.imageBytes;
+    return `data:image/jpeg;base64,${base64EncodeString}`;
+  }
+
+  // imageSize is only supported for gemini-3-pro-image-preview and gemini-3.1-flash-image-preview
   const imageConfig: any = {
     aspectRatio: aspectRatio,
   };
 
-  if (model === ModelType.PRO_IMAGE) {
+  if (model === ModelType.PRO_IMAGE || model === ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW) {
     imageConfig.imageSize = "1K";
   }
 
