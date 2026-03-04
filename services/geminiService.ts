@@ -2,17 +2,19 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { ImageStyle, ModelType, AspectRatio, TextModelType } from "../types";
 
+const getAiInstance = () => {
+  const savedKey = localStorage.getItem('gemini_api_key');
+  const apiKey = savedKey || (window as any).process?.env?.API_KEY || process.env.API_KEY || "";
+  return new GoogleGenAI({ apiKey });
+};
+
 export const generateConceptInThai = async (
   imageB64: string | null,
   additionDetails: string,
   imageStyle: ImageStyle,
   textModel: TextModelType
 ): Promise<string> => {
-  const ai = {
-  const savedKey = localStorage.getItem('gemini_api_key');
-  const apiKey = savedKey || (window as any).process?.env?.API_KEY || "";
-  return new GoogleGenAI({ apiKey });
-};
+  const ai = getAiInstance();
   
   const parts: any[] = [];
   
@@ -59,7 +61,7 @@ export const generateEnhancedPrompt = async (
   maxLength: number,
   textModel: TextModelType
 ): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiInstance();
 
   const prompt = `
     คุณคือ Prompt Engineer ระดับมืออาชีพ เชี่ยวชาญการออกแบบภาพที่สวยงามและสื่อสารได้ทรงพลัง
@@ -88,7 +90,7 @@ export const generateImage = async (
   model: ModelType,
   aspectRatio: AspectRatio
 ): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAiInstance();
 
   if (model === ModelType.IMAGEN_4_0_GENERATE_001) {
     const response = await ai.models.generateImages({
