@@ -8,7 +8,11 @@ export const generateConceptInThai = async (
   imageStyle: ImageStyle,
   textModel: TextModelType
 ): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = {
+  const savedKey = localStorage.getItem('gemini_api_key');
+  const apiKey = savedKey || (window as any).process?.env?.API_KEY || "";
+  return new GoogleGenAI({ apiKey });
+};
   
   const parts: any[] = [];
   

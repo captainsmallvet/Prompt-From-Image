@@ -1,10 +1,31 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+// เพิ่ม useEffect เข้าไปในปีกกาครับ
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ImageStyle, ModelType, AspectRatio, AppState, TextModelType } from './types';
 import NotepadArea from './components/NotepadArea';
 import * as geminiService from './services/geminiService';
 
 const App: React.FC = () => {
+  // --- ระบบจัดการ API Key สำหรับใช้งานส่วนตัว ---
+    const [inputKey, setInputKey] = useState<string>('');
+
+      useEffect(() => {
+          const savedKey = localStorage.getItem('gemini_api_key');
+              if (savedKey) {
+                    setInputKey(savedKey);
+                          (window as any).process = { env: { API_KEY: savedKey } };
+                              } else {
+                                    setInputKey('no API key');
+                                        }
+                                          }, []);
+
+                                            const handleSendKey = () => {
+                                                if (inputKey && inputKey !== 'no API key') {
+                                                      localStorage.setItem('gemini_api_key', inputKey);
+                                                            alert("บันทึก API Key เรียบร้อยแล้วครับ");
+                                                                  window.location.reload(); 
+                                                                      }
+                                                                        };
   const [state, setState] = useState<AppState>({
     referenceImage: null,
     imageStyle: ImageStyle.REFERENCE,
@@ -141,6 +162,27 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
       <div className="w-full max-w-[500px] flex flex-col gap-6">
+      {/* API Key Management Bar */}
+              <div className="mb-6 p-4 bg-gray-900 border border-emerald-500/30 rounded-xl">
+                        <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-emerald-400 uppercase text-left">
+                                                  API Key Control Panel :
+                                                              </label>
+                                                                          <div className="flex flex-wrap sm:flex-nowrap gap-2">
+                                                                                        <input
+                                                                                                        type="text"
+                                                                                                                        value={inputKey}
+                                                                                                                                        onChange={(e) => setInputKey(e.target.value)}
+                                                                                                                                                        className="w-full flex-1 bg-black border border-gray-700 rounded px-3 py-2 text-sm font-mono text-emerald-300 outline-none"
+                                                                                                                                                                      />
+                                                                                                                                                                                    <div className="flex gap-2 w-full sm:w-auto">
+                                                                                                                                                                                                    <button onClick={handleSendKey} className="flex-1 bg-emerald-600 px-4 py-2 rounded text-xs font-bold hover:bg-emerald-700 transition-colors">SEND</button>
+                                                                                                                                                                                                                    <button onClick={() => { navigator.clipboard.writeText(inputKey); alert("Copy แล้วครับ"); }} className="flex-1 bg-blue-600 px-4 py-2 rounded text-xs font-bold">COPY</button>
+                                                                                                                                                                                                                                    <button onClick={() => { localStorage.removeItem('gemini_api_key'); setInputKey(''); alert("ลบ Key แล้วครับ"); }} className="flex-1 bg-red-600 px-4 py-2 rounded text-xs font-bold">CLEAR</button>
+                                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                </div>
         <h1 className="text-3xl font-extrabold text-indigo-700 text-center mb-4 uppercase tracking-wider">
           Prompt From Image
         </h1>
