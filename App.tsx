@@ -202,6 +202,8 @@ const App: React.FC = () => {
 <option value="gemini-flash-latest">Gemini Flash Latest</option>
 <option value="gemini-flash-lite-latest">Gemini Flash Lite Latest</option>
 <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+<option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+<option value="gemini-pro-latest">Gemini Pro (Latest Stable)</option>
           </select>
         </div>
 
@@ -324,12 +326,16 @@ const App: React.FC = () => {
               value={state.selectedModel}
               onChange={(e) => updateState({ selectedModel: e.target.value as ModelType })}
             >
-<option value={ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW}>Gemini 3.1 Flash Image (High Quality)</option>
-<option value={ModelType.PRO_IMAGE}>Gemini 3.0 Pro Image (Premium)</option>
-<option value={ModelType.FLASH_IMAGE}>Gemini 2.5 Flash Image (Standard)</option>
-<option value={ModelType.IMAGEN_4_0_GENERATE_001}>Imagen 4.0</option>
-<option value={ModelType.GEMINI_FLASH_IMAGE_LATEST}>Gemini Flash Image Latest</option>
-<option value={ModelType.GEMINI_PRO_IMAGE_LATEST}>Gemini Pro Image Latest</option>
+<option value="gemini-2.5-flash-image">gemini-2.5-flash-image (Default)</option>
+<option value="gemini-3-pro-image-preview">gemini-3-pro-image-preview</option>
+<option value="imagen-4.0-generate-001">imagen-4.0-generate-001</option>
+<option value="gemini-flash-image-latest">Gemini Flash Image Latest</option>
+<option value="gemini-pro-image-latest">Gemini Pro Image Latest</option>
+<option value="gemini-flash-latest">gemini-flash-latest</option>
+<option value="gemini-flash-lite-latest">gemini-flash-lite-latest</option>
+<option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+<option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview</option>
+<option value="gemini-3.1-flash-image-preview">Gemini 3.1 Flash Image (High Quality)</option>
             </select>
           </div>
 
