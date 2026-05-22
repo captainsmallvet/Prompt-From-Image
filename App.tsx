@@ -33,7 +33,7 @@ const App: React.FC = () => {
     imageConceptThai: '',
     enhancePromptEnglish: '',
     maxPromptLength: 800,
-    selectedTextModel: TextModelType.gemini-3.5-flash,
+    selectedTextModel: TextModelType.GEMINI_3_5_FLASH,
     selectedModel: ModelType.FLASH_IMAGE,
     selectedAspectRatio: '16:9',
     generatedImage: null,
