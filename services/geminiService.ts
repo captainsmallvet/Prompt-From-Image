@@ -12,7 +12,7 @@ export const generateConceptInThai = async (
   imageB64: string | null,
   additionDetails: string,
   imageStyle: ImageStyle,
-  textModel: TextModelType
+  textModel: TextModelType | string
 ): Promise<string> => {
   const ai = getAiInstance();
   
@@ -59,7 +59,7 @@ export const generateConceptInThai = async (
 export const generateEnhancedPrompt = async (
   thaiConcept: string,
   maxLength: number,
-  textModel: TextModelType
+  textModel: TextModelType | string
 ): Promise<string> => {
   const ai = getAiInstance();
 
@@ -87,12 +87,12 @@ export const generateEnhancedPrompt = async (
 
 export const generateImage = async (
   prompt: string,
-  model: ModelType,
+  model: ModelType | string,
   aspectRatio: AspectRatio
 ): Promise<string> => {
   const ai = getAiInstance();
 
-  if (model === ModelType.IMAGEN_4_0_GENERATE_001) {
+  if (model === ModelType.IMAGEN_4_0_GENERATE_001 || model.includes('imagen')) {
     const response = await ai.models.generateImages({
         model: model,
         prompt: prompt,
@@ -111,7 +111,7 @@ export const generateImage = async (
     aspectRatio: aspectRatio,
   };
 
-  if (model === ModelType.PRO_IMAGE || model === ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW) {
+  if (model === ModelType.PRO_IMAGE || model === ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW || model.includes('pro-image') || model.includes('3.1-flash-image')) {
     imageConfig.imageSize = "1K";
   }
 

@@ -42,8 +42,8 @@ export interface AppState {
   imageConceptThai: string;
   enhancePromptEnglish: string;
   maxPromptLength: number;
-  selectedTextModel: TextModelType;
-  selectedModel: ModelType;
+  selectedTextModel: TextModelType | string;
+  selectedModel: ModelType | string;
   selectedAspectRatio: AspectRatio;
   generatedImage: string | null;
   isLoading: boolean;

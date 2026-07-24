@@ -4,28 +4,43 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ImageStyle, ModelType, AspectRatio, AppState, TextModelType } from './types';
 import NotepadArea from './components/NotepadArea';
 import * as geminiService from './services/geminiService';
+import {
+  fetchCentralAIModels,
+  getDefaultModelForLevel,
+  getFallbackModels,
+  APP_IMPORTANCE_LEVEL,
+  CentralAIModel
+} from './services/firebaseModelService';
 
 const App: React.FC = () => {
   // --- ระบบจัดการ API Key สำหรับใช้งานส่วนตัว ---
-    const [inputKey, setInputKey] = useState<string>('');
+  const [inputKey, setInputKey] = useState<string>('');
 
-      useEffect(() => {
-          const savedKey = localStorage.getItem('gemini_api_key');
-              if (savedKey) {
-                    setInputKey(savedKey);
-                          (window as any).process = { env: { API_KEY: savedKey } };
-                              } else {
-                                    setInputKey('no API key');
-                                        }
-                                          }, []);
+  useEffect(() => {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      setInputKey(savedKey);
+      (window as any).process = { env: { API_KEY: savedKey } };
+    } else {
+      setInputKey('no API key');
+    }
+  }, []);
 
-                                            const handleSendKey = () => {
-                                                if (inputKey && inputKey !== 'no API key') {
-                                                      localStorage.setItem('gemini_api_key', inputKey);
-                                                            alert("บันทึก API Key เรียบร้อยแล้วครับ");
-                                                                  window.location.reload(); 
-                                                                      }
-                                                                        };
+  const handleSendKey = () => {
+    if (inputKey && inputKey !== 'no API key') {
+      localStorage.setItem('gemini_api_key', inputKey);
+      alert("บันทึก API Key เรียบร้อยแล้วครับ");
+      window.location.reload(); 
+    }
+  };
+
+  const fallbacks = getFallbackModels();
+  const [textModelsList, setTextModelsList] = useState<CentralAIModel[]>(fallbacks.textModels);
+  const [imageModelsList, setImageModelsList] = useState<CentralAIModel[]>(fallbacks.imageModels);
+
+  const initialDefaultText = getDefaultModelForLevel(fallbacks.textModels, APP_IMPORTANCE_LEVEL)?.value || 'gemini-3.5-flash';
+  const initialDefaultImage = getDefaultModelForLevel(fallbacks.imageModels, APP_IMPORTANCE_LEVEL)?.value || 'gemini-2.5-flash-image';
+
   const [state, setState] = useState<AppState>({
     referenceImage: null,
     imageStyle: ImageStyle.REFERENCE,
@@ -33,13 +48,41 @@ const App: React.FC = () => {
     imageConceptThai: '',
     enhancePromptEnglish: '',
     maxPromptLength: 800,
-    selectedTextModel: TextModelType.GEMINI_3_5_FLASH,
-    selectedModel: ModelType.FLASH_IMAGE,
+    selectedTextModel: initialDefaultText,
+    selectedModel: initialDefaultImage,
     selectedAspectRatio: '16:9',
     generatedImage: null,
     isLoading: false,
     statusMessage: '',
   });
+
+  // โหลด AI Models แบบ Real-Time / Read-Only จาก Central Firestore บนทุกๆ การรีเฟรชหน้า
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCentralModels() {
+      const fetched = await fetchCentralAIModels();
+      if (!isMounted) return;
+
+      if (fetched.textModels && fetched.textModels.length > 0) {
+        setTextModelsList(fetched.textModels);
+        const defaultTextModel = getDefaultModelForLevel(fetched.textModels, APP_IMPORTANCE_LEVEL);
+        if (defaultTextModel) {
+          setState(prev => ({ ...prev, selectedTextModel: defaultTextModel.value }));
+        }
+      }
+
+      if (fetched.imageModels && fetched.imageModels.length > 0) {
+        setImageModelsList(fetched.imageModels);
+        const defaultImageModel = getDefaultModelForLevel(fetched.imageModels, APP_IMPORTANCE_LEVEL);
+        if (defaultImageModel) {
+          setState(prev => ({ ...prev, selectedModel: defaultImageModel.value }));
+        }
+      }
+    }
+
+    loadCentralModels();
+    return () => { isMounted = false; };
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -188,25 +231,22 @@ const App: React.FC = () => {
         </h1>
 
         {/* Text Reasoning Model Selection */}
-        <div className="flex flex-col w-full">
-          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Text Reasoning Model</label>
-          <select 
-            className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors bg-white"
-            value={state.selectedTextModel}
-            onChange={(e) => updateState({ selectedTextModel: e.target.value as TextModelType })}
-          >
-<option value="gemini-3.5-flash">(20)Gemini 3.5 Flash</option>
-<option value="gemini-3-flash-preview">(20)Gemini 3 Flash Preview</option>
-<option value="gemini-3.1-pro-preview">(0)Gemini 3.1 Pro Preview</option>
-<option value="gemini-3.1-flash-lite">(500)Gemini 3.1 Flash Lite</option>
-<option value="gemini-flash-latest">Gemini Flash Latest</option>
-<option value="gemini-flash-lite-latest">Gemini Flash Lite Latest</option>
-<option value="gemini-2.5-flash">(20)Gemini 2.5 Flash</option>
-<option value="gemini-2.5-flash-lite">(20)Gemini 2.5 Flash Lite</option>
-<option value="gemini-2.5-pro">(0)Gemini 2.5 Pro</option>
-<option value="gemini-pro-latest">Gemini Pro (Latest Stable)</option>
-          </select>
-        </div>
+        {textModelsList.length > 0 && (
+          <div className="flex flex-col w-full">
+            <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Text Reasoning Model</label>
+            <select 
+              className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors bg-white"
+              value={state.selectedTextModel}
+              onChange={(e) => updateState({ selectedTextModel: e.target.value })}
+            >
+              {textModelsList.map(m => (
+                <option key={m.id || m.value} value={m.value}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* 1. Reference Image */}
         <div className="flex flex-col w-full">
@@ -320,25 +360,22 @@ const App: React.FC = () => {
 
         {/* 7. Model Selection and Create Image */}
         <div className="flex flex-col gap-4 mb-10">
-          <div className="flex flex-col">
-            <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Model สร้างภาพ</label>
-            <select 
-              className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors"
-              value={state.selectedModel}
-              onChange={(e) => updateState({ selectedModel: e.target.value as ModelType })}
-            >
-<option value="gemini-2.5-flash-image">gemini-2.5-flash-image (Default)</option>
-<option value="gemini-3-pro-image-preview">gemini-3-pro-image-preview</option>
-<option value="imagen-4.0-generate-001">imagen-4.0-generate-001</option>
-<option value="gemini-flash-image-latest">Gemini Flash Image Latest</option>
-<option value="gemini-pro-image-latest">Gemini Pro Image Latest</option>
-<option value="gemini-flash-latest">gemini-flash-latest</option>
-<option value="gemini-flash-lite-latest">gemini-flash-lite-latest</option>
-<option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
-<option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview</option>
-<option value="gemini-3.1-flash-image-preview">Gemini 3.1 Flash Image (High Quality)</option>
-            </select>
-          </div>
+          {imageModelsList.length > 0 && (
+            <div className="flex flex-col">
+              <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Model สร้างภาพ</label>
+              <select 
+                className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors bg-white"
+                value={state.selectedModel}
+                onChange={(e) => updateState({ selectedModel: e.target.value })}
+              >
+                {imageModelsList.map(m => (
+                  <option key={m.id || m.value} value={m.value}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex flex-col">
             <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Aspect Ratio</label>
