@@ -1,11 +1,11 @@
-
-// เพิ่ม useEffect เข้าไปในปีกกาครับ
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ImageStyle, ModelType, AspectRatio, AppState, TextModelType } from './types';
 import NotepadArea from './components/NotepadArea';
+import FloatingMenu from './components/FloatingMenu';
+import AILogModal from './components/AILogModal';
 import * as geminiService from './services/geminiService';
 import {
-  fetchCentralAIModels,
+  subscribeCentralAIModels,
   getDefaultModelForLevel,
   getFallbackModels,
   APP_IMPORTANCE_LEVEL,
@@ -13,14 +13,14 @@ import {
 } from './services/firebaseModelService';
 
 const App: React.FC = () => {
-  // --- ระบบจัดการ API Key สำหรับใช้งานส่วนตัว ---
+  // --- API Key Management (Local & Session) ---
   const [inputKey, setInputKey] = useState<string>('');
 
   useEffect(() => {
     const savedKey = localStorage.getItem('gemini_api_key');
     if (savedKey) {
       setInputKey(savedKey);
-      (window as any).process = { env: { API_KEY: savedKey } };
+      (window as any).process = { env: { API_KEY: savedKey, GEMINI_API_KEY: savedKey } };
     } else {
       setInputKey('no API key');
     }
@@ -29,6 +29,7 @@ const App: React.FC = () => {
   const handleSendKey = () => {
     if (inputKey && inputKey !== 'no API key') {
       localStorage.setItem('gemini_api_key', inputKey);
+      (window as any).process = { env: { API_KEY: inputKey, GEMINI_API_KEY: inputKey } };
       alert("บันทึก API Key เรียบร้อยแล้วครับ");
       window.location.reload(); 
     }
@@ -56,18 +57,22 @@ const App: React.FC = () => {
     statusMessage: '',
   });
 
-  // โหลด AI Models แบบ Real-Time / Read-Only จาก Central Firestore บนทุกๆ การรีเฟรชหน้า
-  useEffect(() => {
-    let isMounted = true;
-    async function loadCentralModels() {
-      const fetched = await fetchCentralAIModels();
-      if (!isMounted) return;
+  const [isLogModalOpen, setIsLogModalOpen] = useState<boolean>(false);
+  const [modalDefaultTab, setModalDefaultTab] = useState<'logs' | 'key'>('logs');
 
+  // Real-Time Subscription to Central Firestore ai_models collection via onSnapshot
+  useEffect(() => {
+    const unsub = subscribeCentralAIModels((fetched) => {
       if (fetched.textModels && fetched.textModels.length > 0) {
         setTextModelsList(fetched.textModels);
         const defaultTextModel = getDefaultModelForLevel(fetched.textModels, APP_IMPORTANCE_LEVEL);
         if (defaultTextModel) {
-          setState(prev => ({ ...prev, selectedTextModel: defaultTextModel.value }));
+          setState(prev => {
+            if (!prev.selectedTextModel || prev.selectedTextModel === 'gemini-3.5-flash') {
+              return { ...prev, selectedTextModel: defaultTextModel.value };
+            }
+            return prev;
+          });
         }
       }
 
@@ -75,13 +80,17 @@ const App: React.FC = () => {
         setImageModelsList(fetched.imageModels);
         const defaultImageModel = getDefaultModelForLevel(fetched.imageModels, APP_IMPORTANCE_LEVEL);
         if (defaultImageModel) {
-          setState(prev => ({ ...prev, selectedModel: defaultImageModel.value }));
+          setState(prev => {
+            if (!prev.selectedModel || prev.selectedModel === 'gemini-2.5-flash-image') {
+              return { ...prev, selectedModel: defaultImageModel.value };
+            }
+            return prev;
+          });
         }
       }
-    }
+    });
 
-    loadCentralModels();
-    return () => { isMounted = false; };
+    return () => unsub();
   }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,18 +121,19 @@ const App: React.FC = () => {
   };
 
   const handleCreateThaiConcept = async () => {
-    updateState({ isLoading: true, statusMessage: 'Analyzing image and details...' });
+    updateState({ isLoading: true, statusMessage: 'Analyzing image and details with Smart Cascade Fallback...' });
     try {
       const concept = await geminiService.generateConceptInThai(
         state.referenceImage,
         state.additionDetails,
         state.imageStyle,
-        state.selectedTextModel
+        state.selectedTextModel,
+        textModelsList
       );
       updateState({ imageConceptThai: concept });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Error creating concept in Thai');
+      alert('Error creating concept in Thai: ' + (error?.message || error));
     } finally {
       updateState({ isLoading: false, statusMessage: '' });
     }
@@ -134,17 +144,18 @@ const App: React.FC = () => {
       alert('Please create or enter Thai concept first.');
       return;
     }
-    updateState({ isLoading: true, statusMessage: 'Generating enhanced English prompt...' });
+    updateState({ isLoading: true, statusMessage: 'Generating enhanced English prompt with Smart Cascade Fallback...' });
     try {
       const prompt = await geminiService.generateEnhancedPrompt(
         state.imageConceptThai,
         state.maxPromptLength,
-        state.selectedTextModel
+        state.selectedTextModel,
+        textModelsList
       );
       updateState({ enhancePromptEnglish: prompt });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Error creating enhanced prompt');
+      alert('Error creating enhanced prompt: ' + (error?.message || error));
     } finally {
       updateState({ isLoading: false, statusMessage: '' });
     }
@@ -156,30 +167,18 @@ const App: React.FC = () => {
       return;
     }
 
-    if (state.selectedModel === ModelType.PRO_IMAGE || state.selectedModel === ModelType.GEMINI_3_1_FLASH_IMAGE_PREVIEW) {
-      const hasKey = await (window as any).aistudio?.hasSelectedApiKey();
-      if (!hasKey) {
-        alert("This model requires a paid API key. Please select one.");
-        await (window as any).aistudio?.openSelectKey();
-        return;
-      }
-    }
-
-    updateState({ isLoading: true, statusMessage: 'Generating high-quality image...' });
+    updateState({ isLoading: true, statusMessage: `Generating high-quality image (${state.selectedModel})...` });
     try {
       const imgUrl = await geminiService.generateImage(
         state.enhancePromptEnglish,
         state.selectedModel,
-        state.selectedAspectRatio
+        state.selectedAspectRatio,
+        imageModelsList
       );
       updateState({ generatedImage: imgUrl });
     } catch (error: any) {
       console.error(error);
-      if (error.message?.includes("Requested entity was not found")) {
-        await (window as any).aistudio?.openSelectKey();
-      } else {
-        alert('Error creating image');
-      }
+      alert('Error creating image: ' + (error?.message || error));
     } finally {
       updateState({ isLoading: false, statusMessage: '' });
     }
@@ -203,45 +202,70 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-[1000px] flex flex-col gap-6">
-      {/* API Key Management Bar */}
-              <div className="mb-6 p-4 bg-gray-900 border border-emerald-500/30 rounded-xl">
-                        <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-bold text-emerald-400 uppercase text-left">
-                                                  API Key Control Panel :
-                                                              </label>
-                                                                          <div className="flex flex-wrap sm:flex-nowrap gap-2">
-                                                                                        <input
-                                                                                                        type="text"
-                                                                                                                        value={inputKey}
-                                                                                                                                        onChange={(e) => setInputKey(e.target.value)}
-                                                                                                                                                        className="w-full flex-1 bg-black border border-gray-700 rounded px-3 py-2 text-sm font-mono text-emerald-300 outline-none"
-                                                                                                                                                                      />
-                                                                                                                                                                                    <div className="flex gap-2 w-full sm:w-auto">
-                                                                                                                                                                                                    <button onClick={handleSendKey} className="flex-1 bg-emerald-600 px-4 py-2 rounded text-xs font-bold hover:bg-emerald-700 transition-colors">SEND</button>
-                                                                                                                                                                                                                    <button onClick={() => { navigator.clipboard.writeText(inputKey); alert("Copy แล้วครับ"); }} className="flex-1 bg-blue-600 px-4 py-2 rounded text-xs font-bold">COPY</button>
-                                                                                                                                                                                                                                    <button onClick={() => { localStorage.removeItem('gemini_api_key'); setInputKey(''); alert("ลบ Key แล้วครับ"); }} className="flex-1 bg-red-600 px-4 py-2 rounded text-xs font-bold">CLEAR</button>
-                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                              </div>
-                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                </div>
-        <h1 className="text-3xl font-extrabold text-indigo-700 text-center mb-4 uppercase tracking-wider">
+    <div className="min-h-screen p-4 md:p-8 flex flex-col items-center bg-slate-50">
+      <div className="w-full max-w-[1000px] flex flex-col gap-6 pb-24">
+        {/* API Key Management Bar */}
+        <div className="p-4 bg-gray-900 border border-emerald-500/30 rounded-2xl shadow-md">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Gemini API Key Control Panel
+              </label>
+              <button
+                onClick={() => { setModalDefaultTab('logs'); setIsLogModalOpen(true); }}
+                className="text-xs text-indigo-300 hover:text-white flex items-center gap-1 font-semibold transition-colors"
+              >
+                <span>📊 ดูประวัติ & Fallback Logs</span>
+              </button>
+            </div>
+            <div className="flex flex-wrap sm:flex-nowrap gap-2">
+              <input
+                type="text"
+                value={inputKey}
+                onChange={(e) => setInputKey(e.target.value)}
+                placeholder="กรอก Gemini API Key หรือใช้ค่าเริ่มต้นจากระบบ"
+                className="w-full flex-1 bg-black border border-gray-700 rounded-xl px-3 py-2 text-sm font-mono text-emerald-300 outline-none focus:border-emerald-500"
+              />
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button onClick={handleSendKey} className="flex-1 sm:flex-none bg-emerald-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 text-white transition-colors">SAVE</button>
+                <button onClick={() => { navigator.clipboard.writeText(inputKey); alert("Copy แล้วครับ"); }} className="flex-1 sm:flex-none bg-blue-600 px-3 py-2 rounded-xl text-xs font-bold text-white hover:bg-blue-700 transition-colors">COPY</button>
+                <button onClick={() => { localStorage.removeItem('gemini_api_key'); setInputKey(''); alert("ลบ Key แล้วครับ"); }} className="flex-1 sm:flex-none bg-rose-600 px-3 py-2 rounded-xl text-xs font-bold text-white hover:bg-rose-700 transition-colors">CLEAR</button>
+                <button
+                  onClick={() => { setModalDefaultTab('key'); setIsLogModalOpen(true); }}
+                  className="flex-1 sm:flex-none bg-indigo-600 px-4 py-2 rounded-xl text-xs font-bold text-white hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
+                >
+                  ⚡ TEST KEY
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 className="text-3xl font-extrabold text-indigo-700 text-center mb-2 uppercase tracking-wider">
           Prompt From Image
         </h1>
+        <p className="text-center text-sm text-gray-500 -mt-4 mb-2">
+          Dual-Layer Resilient Gemini AI Engine with Smart Cascade Fallback & Centralized Model Registry
+        </p>
 
         {/* Text Reasoning Model Selection */}
         {textModelsList.length > 0 && (
           <div className="flex flex-col w-full">
-            <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Text Reasoning Model</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-gray-700 font-bold ml-1 text-lg">Text Reasoning Model</label>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-mono font-medium">
+                Live Synced with Registry ({textModelsList.length} models)
+              </span>
+            </div>
             <select 
-              className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors bg-white"
+              className="w-full p-2.5 border-2 border-gray-300 rounded-xl outline-none focus:border-indigo-500 transition-colors bg-white font-medium text-gray-800"
               value={state.selectedTextModel}
               onChange={(e) => updateState({ selectedTextModel: e.target.value })}
             >
               {textModelsList.map(m => (
                 <option key={m.id || m.value} value={m.value}>
-                  {m.name}
+                  {m.name} {m.isDefaultLevel1 ? '★ (Default Level 1)' : ''}
                 </option>
               ))}
             </select>
@@ -250,127 +274,144 @@ const App: React.FC = () => {
 
         {/* 1. Reference Image */}
         <div className="flex flex-col w-full">
-          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Reference Image</label>
-          <div className="w-full h-[300px] bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
-            {state.referenceImage ? (
-              <img 
-                src={state.referenceImage} 
-                alt="Reference" 
-                className="max-w-full max-h-full object-contain"
+          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">1. Reference Image (ภาพอ้างอิง)</label>
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-2">
+              <button 
+                onClick={handleOpenClick}
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-colors shadow-sm"
+              >
+                OPEN
+              </button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                accept="image/*" 
+                className="hidden" 
               />
-            ) : (
-              <span className="text-gray-400">No Image Selected</span>
+            </div>
+            {state.referenceImage && (
+              <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-2 max-w-md bg-white">
+                <img 
+                  src={state.referenceImage} 
+                  alt="Reference Preview" 
+                  className="w-full h-auto rounded max-h-60 object-contain mx-auto"
+                />
+                <button 
+                  onClick={() => updateState({ referenceImage: null })}
+                  className="absolute top-4 right-4 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
             )}
           </div>
-          <div className="flex gap-2 mt-2">
-            <button 
-              onClick={handleOpenClick}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors font-medium"
-            >
-              Open
-            </button>
-            <button 
-              onClick={() => updateState({ referenceImage: null })}
-              className="px-4 py-2 bg-red-400 hover:bg-red-500 text-white rounded-md transition-colors font-medium"
-            >
-              Clear
-            </button>
-          </div>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*" 
-            onChange={handleFileChange}
-          />
         </div>
 
-        {/* 2. Image Style */}
+        {/* 2. Style Image */}
         <div className="flex flex-col w-full">
-          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Image Style</label>
+          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">2. Style Image (สไตล์ของภาพ)</label>
           <select 
-            className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors"
+            className="w-full p-2.5 border-2 border-gray-300 rounded-xl outline-none focus:border-indigo-500 transition-colors bg-white font-medium text-gray-800"
             value={state.imageStyle}
             onChange={(e) => updateState({ imageStyle: e.target.value as ImageStyle })}
           >
-            {Object.values(ImageStyle).map(style => (
+            {Object.values(ImageStyle).map((style) => (
               <option key={style} value={style}>{style}</option>
             ))}
           </select>
         </div>
 
         {/* 3. Addition Details */}
-        <NotepadArea 
-          label="Addition Details"
-          value={state.additionDetails}
-          onChange={(val) => updateState({ additionDetails: val })}
-          onCopy={() => copyToClipboard(state.additionDetails)}
-          onClear={() => updateState({ additionDetails: '' })}
-          placeholder="ระบุรายละเอียดเพิ่มเติมที่ต้องการดัดแปลง..."
-        />
+        <div className="flex flex-col w-full">
+          <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">3. Addition Details (ข้อมูลเพิ่มเติม)</label>
+          <textarea 
+            rows={4}
+            className="w-full p-3 border-2 border-gray-300 rounded-xl outline-none focus:border-indigo-500 transition-colors resize-none bg-white text-gray-800"
+            placeholder="ใส่รายละเอียดที่ต้องการเพิ่ม เช่น โทนสี อารมณ์ของภาพ องค์ประกอบเฉพาะ..."
+            value={state.additionDetails}
+            onChange={(e) => updateState({ additionDetails: e.target.value })}
+          />
+        </div>
 
-        {/* 5. Create Image Concept in Thai Button */}
+        {/* 4. Action: Create Concept in Thai */}
         <button 
           onClick={handleCreateThaiConcept}
           disabled={state.isLoading}
-          className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
+          className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
         >
-          {state.isLoading ? 'Processing...' : 'Create Image Concept in Thai'}
+          {state.isLoading && state.statusMessage.includes('image and details') ? 'Analyzing...' : 'CREATE CONCEPT IN THAI'}
         </button>
 
-        {/* 4. Image Concept in Thai */}
+        {/* 5. Image Concept in Thai */}
         <NotepadArea 
-          label="Image Concept in Thai"
+          label="5. Image Concept in Thai (คอนเซปต์ภาพภาษาไทย)"
           value={state.imageConceptThai}
           onChange={(val) => updateState({ imageConceptThai: val })}
           onCopy={() => copyToClipboard(state.imageConceptThai)}
           onClear={() => updateState({ imageConceptThai: '' })}
-          placeholder="Concept ภาพภาษาไทยจะแสดงที่นี่..."
+          placeholder="Concept จะปรากฏที่นี่หลังจากคลิกปุ่มสร้าง..."
+          rows={6}
         />
 
-        {/* 6. Enhance Prompt in English Section */}
-        <div className="flex flex-col gap-2 mb-2">
-          <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-gray-700 mb-1">
-             <span>Max Prompt Length :</span>
-             <input 
-               type="number"
-               className="w-20 p-1 border border-gray-300 rounded bg-white text-center notepad-font"
-               value={state.maxPromptLength}
-               onChange={(e) => updateState({ maxPromptLength: parseInt(e.target.value) || 0 })}
-             />
-             <span>characters</span>
+        {/* 6. Action: Create Enhanced Prompt */}
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center px-1">
+            <span className="text-gray-700 font-bold">Max Character:</span>
+            <div className="flex items-center gap-2">
+              <input 
+                type="range" 
+                min="100" 
+                max="2000" 
+                step="50"
+                value={state.maxPromptLength}
+                onChange={(e) => updateState({ maxPromptLength: parseInt(e.target.value) })}
+                className="w-32 md:w-48 accent-indigo-600"
+              />
+              <span className="font-mono text-indigo-600 font-bold w-12 text-right">{state.maxPromptLength}</span>
+            </div>
           </div>
           <button 
             onClick={handleCreateEnhancedPrompt}
             disabled={state.isLoading}
-            className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
-            {state.isLoading ? 'Processing...' : 'Create enhance prompt in English'}
+            {state.isLoading && state.statusMessage.includes('enhanced English') ? 'Generating...' : 'CREATE ENHANCED PROMPT'}
           </button>
         </div>
 
+        {/* 6. Enhanced Prompt in English */}
         <NotepadArea 
-          label="enhance prompt in English"
+          label="6. Enhanced Prompt in English (พรอมต์ภาษาอังกฤษแบบละเอียด)"
           value={state.enhancePromptEnglish}
           onChange={(val) => updateState({ enhancePromptEnglish: val })}
           onCopy={() => copyToClipboard(state.enhancePromptEnglish)}
           onClear={() => updateState({ enhancePromptEnglish: '' })}
-          placeholder="Enhanced English Prompt will appear here..."
+          placeholder="Enhanced prompt จะปรากฏที่นี่หลังจากคลิกปุ่มสร้าง..."
+          rows={6}
         />
 
         {/* 7. Model Selection and Create Image */}
-        <div className="flex flex-col gap-4 mb-10">
+        <div className="flex flex-col gap-4 mb-4">
           {imageModelsList.length > 0 && (
             <div className="flex flex-col">
-              <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Model สร้างภาพ</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-gray-700 font-bold ml-1 text-lg">Model สร้างภาพ</label>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-mono font-medium">
+                  Live Synced ({imageModelsList.length} models)
+                </span>
+              </div>
               <select 
-                className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors bg-white"
+                className="w-full p-2.5 border-2 border-gray-300 rounded-xl outline-none focus:border-indigo-500 transition-colors bg-white font-medium text-gray-800"
                 value={state.selectedModel}
                 onChange={(e) => updateState({ selectedModel: e.target.value })}
               >
                 {imageModelsList.map(m => (
                   <option key={m.id || m.value} value={m.value}>
-                    {m.name}
+                    {m.name} {m.isDefaultLevel1 ? '★ (Default Level 1)' : ''}
                   </option>
                 ))}
               </select>
@@ -380,7 +421,7 @@ const App: React.FC = () => {
           <div className="flex flex-col">
             <label className="text-gray-700 font-bold mb-2 ml-1 text-lg">Aspect Ratio</label>
             <select 
-              className="w-full p-2 border-2 border-gray-300 rounded-lg outline-none focus:border-indigo-500 transition-colors"
+              className="w-full p-2.5 border-2 border-gray-300 rounded-xl outline-none focus:border-indigo-500 transition-colors bg-white font-medium text-gray-800"
               value={state.selectedAspectRatio}
               onChange={(e) => updateState({ selectedAspectRatio: e.target.value as AspectRatio })}
             >
@@ -397,7 +438,7 @@ const App: React.FC = () => {
             disabled={state.isLoading}
             className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
           >
-            {state.isLoading ? 'Generating Image...' : 'CREATE IMAGE'}
+            {state.isLoading && state.statusMessage.includes('image') ? 'Generating Image...' : 'CREATE IMAGE'}
           </button>
 
           {state.statusMessage && (
@@ -429,6 +470,26 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* 6. Dynamic Short Model Floating Menu & Quick Switcher */}
+      <FloatingMenu
+        selectedTextModel={state.selectedTextModel}
+        selectedImageModel={state.selectedModel}
+        textModelsList={textModelsList}
+        imageModelsList={imageModelsList}
+        onSelectTextModel={(model) => updateState({ selectedTextModel: model })}
+        onSelectImageModel={(model) => updateState({ selectedModel: model })}
+        onOpenLogModal={() => { setModalDefaultTab('logs'); setIsLogModalOpen(true); }}
+        onOpenKeyModal={() => { setModalDefaultTab('key'); setIsLogModalOpen(true); }}
+      />
+
+      {/* 7. AI Log & Execution Transparency Modal with API Key Manager */}
+      <AILogModal
+        isOpen={isLogModalOpen}
+        onClose={() => setIsLogModalOpen(false)}
+        defaultTab={modalDefaultTab}
+        onKeyUpdated={(newKey) => setInputKey(newKey || 'no API key')}
+      />
     </div>
   );
 };

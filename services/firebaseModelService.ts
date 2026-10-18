@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, onSnapshot, Unsubscribe } from "firebase/firestore";
 
 // Centralized Firebase Configuration
 const firebaseConfig = {
@@ -35,8 +35,8 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 export function normalizeModelDoc(docId: string, data: any): CentralAIModel {
-  const modelValue = data.value || data.modelId || data.id || docId;
-  const modelName = data.name || data.label || data.displayName || data.title || modelValue;
+  const modelValue = (data.value || data.modelId || data.id || docId || '').toString().trim();
+  const modelName = (data.name || data.label || data.displayName || data.title || modelValue).toString().trim();
   
   let category = (data.category || data.type || data.modelCategory || '').toLowerCase();
   if (!category) {
@@ -132,6 +132,98 @@ export function getDefaultModelForLevel(models: CentralAIModel[], level: 1 | 2 =
   return models[0];
 }
 
+/**
+ * Deduplicates models by value to completely avoid React duplicate key warnings
+ */
+export function deduplicateModels(models: CentralAIModel[]): CentralAIModel[] {
+  const seen = new Set<string>();
+  const result: CentralAIModel[] = [];
+
+  for (const m of models) {
+    const key = (m.value || m.id).toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(m);
+    }
+  }
+
+  return result;
+}
+
+// In-memory cache of central models for synchronous access in fallback cascades
+let cachedModels: { textModels: CentralAIModel[]; imageModels: CentralAIModel[] } = getFallbackModels();
+
+export function getCachedCentralAIModels(): { textModels: CentralAIModel[]; imageModels: CentralAIModel[] } {
+  return cachedModels;
+}
+
+/**
+ * Real-time subscription to Central Firestore `ai_models` collection.
+ * Automatically notifies subscribers whenever new models are added,
+ * updated, or reordered in the central database.
+ */
+export function subscribeCentralAIModels(
+  onUpdate: (models: { textModels: CentralAIModel[]; imageModels: CentralAIModel[] }) => void,
+  onError?: (error: any) => void
+): Unsubscribe {
+  try {
+    const colRef = collection(db, "ai_models");
+    const unsubscribe = onSnapshot(
+      colRef,
+      (snapshot) => {
+        const allModels: CentralAIModel[] = [];
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const model = normalizeModelDoc(docSnap.id, data);
+          if (model.isActive) {
+            allModels.push(model);
+          }
+        });
+
+        if (allModels.length === 0) {
+          const fallbacks = getFallbackModels();
+          cachedModels = fallbacks;
+          onUpdate(fallbacks);
+          return;
+        }
+
+        allModels.sort((a, b) => a.order - b.order);
+
+        const textModels = deduplicateModels(allModels.filter(m => m.category === 'text'));
+        const imageModels = deduplicateModels(allModels.filter(m => m.category === 'image'));
+
+        const payload = {
+          textModels: textModels.length > 0 ? textModels : getFallbackModels().textModels,
+          imageModels: imageModels.length > 0 ? imageModels : getFallbackModels().imageModels,
+        };
+
+        cachedModels = payload;
+        onUpdate(payload);
+      },
+      (error) => {
+        console.warn("Firestore onSnapshot error for ai_models, using fallback registry:", error);
+        if (onError) onError(error);
+        const fallbacks = getFallbackModels();
+        cachedModels = fallbacks;
+        onUpdate(fallbacks);
+      }
+    );
+
+    return unsubscribe;
+  } catch (error) {
+    console.warn("Failed to subscribe to central AI models Firestore:", error);
+    if (onError) onError(error);
+    const fallbacks = getFallbackModels();
+    cachedModels = fallbacks;
+    onUpdate(fallbacks);
+    return () => {};
+  }
+}
+
+/**
+ * One-shot fetch for central AI models
+ */
 export async function fetchCentralAIModels(): Promise<{ textModels: CentralAIModel[]; imageModels: CentralAIModel[] }> {
   const fallbacks = getFallbackModels();
   try {
@@ -151,16 +243,18 @@ export async function fetchCentralAIModels(): Promise<{ textModels: CentralAIMod
       return fallbacks;
     }
 
-    // Sort by order ascending
     allModels.sort((a, b) => a.order - b.order);
 
-    const textModels = allModels.filter(m => m.category === 'text');
-    const imageModels = allModels.filter(m => m.category === 'image');
+    const textModels = deduplicateModels(allModels.filter(m => m.category === 'text'));
+    const imageModels = deduplicateModels(allModels.filter(m => m.category === 'image'));
 
-    return {
+    const result = {
       textModels: textModels.length > 0 ? textModels : fallbacks.textModels,
       imageModels: imageModels.length > 0 ? imageModels : fallbacks.imageModels,
     };
+
+    cachedModels = result;
+    return result;
   } catch (error) {
     console.warn("Could not fetch central AI models from Firestore, utilizing fallback options:", error);
     return fallbacks;

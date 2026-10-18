@@ -1,5 +1,8 @@
 {
   "name": "Prompt from Image",
   "description": "An AI-powered tool that analyzes reference images to create detailed visual concepts and enhanced English prompts for high-quality image generation.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
